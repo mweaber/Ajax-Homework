@@ -58,15 +58,15 @@
           console.log("WORKING");
 
           var picked = $(this).attr("data-name");
-          var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=5";
+          var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=10";
           console.log(picked);
           // ajax call
           $.ajax({
             url: queryURL,
             method: "GET"
           }).then(function (response) {
-            // console.log(response);
-            var imageUrl = response.data[0].images.fixed_height.url;
+            console.log(response);
+            var imageUrl = response.data[1].images.fixed_height.url;
             var animalImage = $("<img>");
             animalImage.attr("src", imageUrl);
             animalImage.attr("alt", "image");
