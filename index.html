@@ -27,7 +27,7 @@
     <input id="addAnimal" type="submit" value="Search for new animal!">
   </form>
 
-  
+
   <div id="imageArea">
 
   </div>
@@ -38,7 +38,7 @@
 
     // Array with my themes/topics
     var animals = ["dog", "cat", "horse", "bear", "cow"];
-    var picked = $(this).attr("data-name");
+    
     // function to make a new button for each item in the array
     function makeButtons() {
       // stops buttons from duplicating each time
@@ -52,48 +52,51 @@
         a.attr("data-name", animals[i]);
         // appends new button 
         $("#topic-animals").append(a);
+
+        $("button").on("click", function () {
+          
+          console.log("WORKING");
+
+          var picked = $(this).attr("data-name");
+          var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=5";
+          console.log(picked);
+          // ajax call
+          $.ajax({
+            url: queryURL,
+            method: "GET"
+          }).then(function (response) {
+            // console.log(response);
+            var imageUrl = response.data[0].images.fixed_height.url;
+            var animalImage = $("<img>");
+            animalImage.attr("src", imageUrl);
+            animalImage.attr("alt", "image");
+            $("#imageArea").prepend(animalImage);
+
+          });
+        });
       }
     }
 
-    $("#addAnimal").on("click", function (event) {
-      // function for each button click
-      // prevents the button from reloading page, stops default actions
-      event.preventDefault();
-      // new variable to get value from input field
-      var animalLook = $("#animal-input").val().trim();
-      // pushes the input to the array
-      animals.push(animalLook);
-      // clears input field for next input
-      $("#ainmal-input").val("");
-      // runs the makeButtons to create the button and add to page.
+      $("#addAnimal").on("click", function (event) {
+        // function for each button click
+        // prevents the button from reloading page, stops default actions
+        event.preventDefault();
+        // new variable to get value from input field
+        var animalLook = $("#animal-input").val().trim();
+        // pushes the input to the array
+        animals.push(animalLook);
+        // clears input field for next input
+        $("#ainmal-input").val("");
+        // runs the makeButtons to create the button and add to page.
+        makeButtons();
+      });
+
+
+
+
+
+
       makeButtons();
-    });
-
-
-
-    $("button").on("click", function () {
-      console.log(picked);
-    });
-
-
-    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=5";
-
-    // ajax call
-    $.ajax({
-      url: queryURL,
-      method: "GET"
-    }).then(function (response) {
-      // console.log(response);
-      var imageUrl = response.data[0].images.fixed_height.url;
-      var animalImage = $("<img>");
-      animalImage.attr("src", imageUrl);
-      animalImage.attr("alt", "image");
-      $("#imageArea").prepend(animalImage);
-
-    });
-
-
-    makeButtons();
   </script>
 
 </body>
