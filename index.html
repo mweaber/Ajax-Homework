@@ -17,6 +17,8 @@
 <body>
 
   <div id="topic-animals"></div>
+
+
   <form id="add-animal">
     <label for="animalSearch">Search for new animal</label>
     <!-- Added the onfocus to clear field once user clicks to add new item -->
@@ -24,6 +26,8 @@
     <br>
     <input id="addAnimal" type="submit" value="Search for new animal!">
   </form>
+
+  
   <div id="imageArea">
 
   </div>
@@ -34,7 +38,7 @@
 
     // Array with my themes/topics
     var animals = ["dog", "cat", "horse", "bear", "cow"];
-
+    var picked = $(this).attr("data-name");
     // function to make a new button for each item in the array
     function makeButtons() {
       // stops buttons from duplicating each time
@@ -65,27 +69,29 @@
       makeButtons();
     });
 
-    $("button").on("click", function(){
-      var picked = $(this).attr("data-name");
-      console.log(picked);
-      console.log("WTF");
-      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=5";
 
-      // ajax call
-       $.ajax({
-        url: queryURL,
-        method: "GET"
-        }).then(function (response) {
-        // console.log(response);
-        var imageUrl = response.data[0].images.fixed_height.url;
-        var animalImage = $("<img>");
-        animalImage.attr("src", imageUrl);
-        animalImage.attr("alt", "image");
-       $("#imageArea").prepend(animalImage);
-  
-       });
+
+    $("button").on("click", function () {
+      console.log(picked);
+    });
+
+
+    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=5";
+
+    // ajax call
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).then(function (response) {
+      // console.log(response);
+      var imageUrl = response.data[0].images.fixed_height.url;
+      var animalImage = $("<img>");
+      animalImage.attr("src", imageUrl);
+      animalImage.attr("alt", "image");
+      $("#imageArea").prepend(animalImage);
 
     });
+
 
     makeButtons();
   </script>
