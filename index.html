@@ -3,18 +3,30 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Giphy API</title>
+  <title>Giphy API Homework</title>
+  <link href="https://fonts.googleapis.com/css?family=Happy+Monkey" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous">
   <style type="text/css">
     button,
     div,
     form,
     input {
       margin: 10px;
+      font-family: 'Happy Monkey', cursive;
     }
+    body {
+      background-image: linear-gradient(to right, #371d8d , rgb(81, 85, 65));
+    }
+
   </style>
 </head>
 
 <body>
+  <div id="masthead">
+    <h2>Animal Giphy</h2>
+  </div>
+
 
   <div id="topic-animals"></div>
 
@@ -24,12 +36,14 @@
     <!-- Added the onfocus to clear field once user clicks to add new item -->
     <input type="text" onfocus="this.value=''" id="animal-input">
     <br>
-    <input id="addAnimal" type="submit" value="Search for new animal!">
+    <input id="addAnimal" class="btn btn-outline-info" type="submit" value="Search for new animal!">
   </form>
 
 
   <div id="imageArea">
+    <div class="stillGIF">
 
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -38,7 +52,7 @@
 
     // Array with my themes/topics
     var animals = ["dog", "cat", "horse", "bear", "cow"];
-    
+
     // function to make a new button for each item in the array
     function makeButtons() {
       // stops buttons from duplicating each time
@@ -46,6 +60,7 @@
       for (var i = 0; i < animals.length; i++) {
         // for each item in the loop create a button
         var a = $("<button>");
+        a.addClass("btn btn-info");
         // adds class to the button and also adds text for each string
         a.addClass("animals").text(animals[i]);
         // adds attribute data-name for each item
@@ -53,50 +68,82 @@
         // appends new button 
         $("#topic-animals").append(a);
 
-        $("button").on("click", function () {
-          
-          console.log("WORKING");
 
-          var picked = $(this).attr("data-name");
-          var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=10";
-          console.log(picked);
-          // ajax call
-          $.ajax({
-            url: queryURL,
-            method: "GET"
-          }).then(function (response) {
-            console.log(response);
-            var imageUrl = response.data[1].images.fixed_height.url;
-            var animalImage = $("<img>");
-            animalImage.attr("src", imageUrl);
-            animalImage.attr("alt", "image");
-            $("#imageArea").prepend(animalImage);
-
-          });
-        });
       }
     }
 
-      $("#addAnimal").on("click", function (event) {
-        // function for each button click
-        // prevents the button from reloading page, stops default actions
-        event.preventDefault();
-        // new variable to get value from input field
-        var animalLook = $("#animal-input").val().trim();
-        // pushes the input to the array
-        animals.push(animalLook);
-        // clears input field for next input
-        $("#ainmal-input").val("");
-        // runs the makeButtons to create the button and add to page.
-        makeButtons();
-      });
-
-
-
-
-
-
+    $("#addAnimal").on("click", function (event) {
+      // function for each button click
+      // prevents the button from reloading page, stops default actions
+      event.preventDefault();
+      // new variable to get value from input field
+      var animalLook = $("#animal-input").val().trim();
+      // pushes the input to the array
+      animals.push(animalLook);
+      // clears input field for next input
+      $("#ainmal-input").val("");
+      // runs the makeButtons to create the button and add to page.
       makeButtons();
+    });
+
+    $("#topic-animals").on("click", ".animals", function () {
+
+      $("#imageArea").text("");
+      var picked = $(this).attr("data-name");
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + picked + "&api_key=y0qmhKFWULgCyqCqVUg9ArvR5V5J3xI8&limit=10";
+      console.log(picked);
+      // ajax call
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).then(function (response) {
+
+        // console.log(response);
+        // Create new variable set to the response data
+        var results = response.data;
+        // Creating for loop to get the still images from the ajax call
+        // Also grabs the rating and will hold the if/else to animate gifs
+        // Last will append the results to the DOM
+        for (var j = 0; j < results.length; j++) {
+          var imageUrl = response.data[j].images.original_still.url;
+          var ratings = response.data[j].rating
+          // console.log(ratings);
+          // New variable that creates an image tag
+          var animalImage = $("<img>");
+          // Sets attributes to the previously created image tag
+          // Stores the still/animated/src for all results
+          animalImage.attr("src", imageUrl);
+          animalImage.attr("alt", "image");
+          animalImage.attr("data-animate", response.data[j].images.fixed_height.url);
+          animalImage.attr("data-still", results[j].images.fixed_height_still.url);
+          animalImage.attr("data-state", "still");
+          animalImage.attr("class", "gif"), stillSource = results[j].images.fixed_height_still.url;
+          // Starts the on click function to handle animates
+          $(animalImage).on("click", function () {
+            // New variable to data-states
+            var state = $(this).attr("data-state");
+            if (state === "still") {
+              // Changes the still image to the animated
+              $(this).attr("src", $(this).attr("data-animate"));
+              $(this).attr("data-state", "animate");
+            } else {
+              // Sets back to the still image
+              $(this).attr("src", $(this).attr("data-still"));
+              $(this).attr("data-state", "still");
+            }
+          });
+          // Creates a new div and will update ratings and append
+          $("#imageArea").prepend(animalImage);
+          var displayRating = $("<div>").text("Rating:" + ratings);
+          $("#imageArea").prepend(displayRating);
+        }
+      });
+    });
+
+
+
+
+    makeButtons();
   </script>
 
 </body>
